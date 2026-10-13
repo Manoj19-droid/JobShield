@@ -1,0 +1,308 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobShield - Fake Job Detector</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- New welcome character styles -->
+    <style>
+        .welcome-character {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 28px;
+            max-width: 900px;
+            margin: 0 auto 30px;
+            padding: 0 16px;
+            box-sizing: border-box;
+
+            opacity: 0;
+            clip-path: inset(0 0 100% 0);
+            animation: welcomeReveal 1.4s ease-out 2.5s forwards;
+        }
+
+        .welcome-visual {
+            width: min(42%, 300px);
+            flex-shrink: 0;
+        }
+
+        .welcome-image {
+            display: block;
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            border-radius: 18px;
+        }
+
+        .welcome-speech {
+            flex: 1;
+            max-width: 430px;
+            padding: 22px;
+            border-radius: 18px;
+            background: rgba(35, 91, 170, 0.12);
+            border: 1px solid rgba(100, 160, 255, 0.3);
+        }
+
+        .welcome-speech p {
+            margin: 0 0 8px;
+            font-size: 17px;
+        }
+
+        .welcome-speech h2 {
+            margin: 0 0 10px;
+            font-size: clamp(22px, 3vw, 32px);
+        }
+
+        .welcome-speech span {
+            line-height: 1.6;
+        }
+
+        @keyframes welcomeReveal {
+            from {
+                opacity: 0;
+                clip-path: inset(0 0 100% 0);
+                transform: translateY(-12px);
+            }
+
+            to {
+                opacity: 1;
+                clip-path: inset(0 0 0 0);
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .welcome-character {
+                flex-direction: column;
+                gap: 14px;
+            }
+
+            .welcome-visual {
+                width: min(100%, 300px);
+            }
+
+            .welcome-speech {
+                width: 100%;
+                box-sizing: border-box;
+                text-align: center;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .welcome-character {
+                animation: none;
+                opacity: 1;
+                clip-path: none;
+                transform: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar" id="home">
+        <a href="#home" class="brand">🔍 JobShield</a>
+
+        <div class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#check-job">Check a Job</a>
+            <a href="#safety-tips">Safety Tips</a>
+            <a href="#about">About</a>
+        </div>
+    </nav>
+
+    <main class="container">
+
+        <!-- NEW: Welcome character -->
+        <section
+            class="welcome-character"
+            id="welcomeCharacter"
+            aria-label="JobShield welcome assistant"
+        >
+            <div class="welcome-visual">
+                <img
+                    class="welcome-image"
+                    src="images/Jobshield-welcome.jpeg"
+                    alt="Friendly 3D JobShield assistant"
+                >
+            </div>
+
+            <div class="welcome-speech">
+                <p>Hey! 👋</p>
+                <h2>We are here for your help.</h2>
+                <span>
+                    Let's check this job together and help you stay safe.
+                </span>
+            </div>
+        </section>
+        <!-- END NEW SECTION -->
+
+        <section class="header">
+            <span class="tag">🛡️ JOB SAFETY ASSISTANT</span>
+            <h1>Is This Job <span>Real or Fake?</span></h1>
+            <p>Check job postings and links for suspicious signs before you apply.</p>
+        </section>
+
+        <section class="card" id="check-job">
+            <h2>📄 Analyze a Job Posting</h2>
+            <p class="subtitle">
+                Paste a job email, description, or application link below.
+            </p>
+
+            <label for="jobUrl">🔗 Job Application Link (Optional)</label>
+
+            <input
+                type="url"
+                id="jobUrl"
+                name="jobUrl"
+                placeholder="https://example.com/careers/job"
+                autocomplete="url"
+                aria-label="Job application URL"
+            >
+
+            <p class="privacy-note">
+                Enter a public job posting link. Avoid private or confidential URLs.
+            </p>
+
+            <label for="jobText">Job description or email</label>
+
+            <div class="editor">
+                <div
+                    id="highlightLayer"
+                    class="highlight-layer"
+                    aria-hidden="true"
+                ></div>
+
+                <textarea
+                    id="jobText"
+                    placeholder="Paste the complete job description or recruitment email here..."
+                    spellcheck="false"
+                    aria-label="Job description or email"
+                ></textarea>
+            </div>
+
+            <p class="highlight-note">
+                <span class="legend"></span>
+                Suspicious phrases will be highlighted as you type.
+            </p>
+
+            <div class="button-row">
+                <button id="checkBtn" class="primary-btn" type="button">
+                    <span id="buttonText">🔎 Analyze Job</span>
+                    <span id="loader" class="loader"></span>
+                </button>
+
+                <button id="sampleBtn" class="secondary-btn" type="button">
+                    🧪 Try Sample Job
+                </button>
+
+                <button id="clearBtn" class="reset-btn" type="button">
+                    ↻ Clear
+                </button>
+            </div>
+
+            <p class="privacy-note">
+                Demo version: avoid pasting personal or confidential information.
+            </p>
+        </section>
+
+        <!-- Original result section -->
+        <section class="result" id="resultBox" aria-live="polite">
+            <div class="result-icon">🤖</div>
+
+            <h2 id="resultText">Your result will appear here</h2>
+
+            <p id="reasonText">
+                Paste a job posting and select Analyze Job.
+            </p>
+
+            <div class="risk-area">
+                <div class="risk-heading">
+                    <span>Risk Level</span>
+                    <span id="riskLabel">Not analyzed</span>
+                </div>
+
+                <div class="risk-track">
+                    <div id="riskBar" class="risk-bar"></div>
+                </div>
+            </div>
+
+            <div class="warning-list">
+                <h3>🔍 Suspicious Signs Checklist</h3>
+
+                <ul id="signsList">
+                    <li class="neutral-sign">
+                        Analysis has not started yet.
+                    </li>
+                </ul>
+            </div>
+
+            <p id="confidenceText" class="disclaimer"></p>
+        </section>
+
+        <!-- Original safety tips -->
+        <section class="info-section" id="safety-tips">
+            <h2>🛡️ Job Safety Tips</h2>
+
+            <div class="steps">
+                <article class="step">
+                    <span>01</span>
+                    <h3>Never Pay to Get Hired</h3>
+                    <p>
+                        Be cautious if someone demands registration fees
+                        or payment to guarantee a job.
+                    </p>
+                </article>
+
+                <article class="step">
+                    <span>02</span>
+                    <h3>Verify the Recruiter</h3>
+                    <p>
+                        Check the company's official website and careers
+                        page independently.
+                    </p>
+                </article>
+
+                <article class="step">
+                    <span>03</span>
+                    <h3>Question Unrealistic Offers</h3>
+                    <p>
+                        Unusually high salaries with no interview or
+                        experience requirements deserve scrutiny.
+                    </p>
+                </article>
+            </div>
+        </section>
+
+        <!-- Original about section -->
+        <section class="about-section" id="about">
+            <h2>About JobShield</h2>
+
+            <p>
+                JobShield is a student mini-project designed to help users
+                identify potential warning signs in job postings and
+                application links. It combines job-description analysis
+                with URL safety checks to help users make more informed
+                decisions. No automated check can guarantee that a job
+                or website is safe.
+            </p>
+        </section>
+
+        <footer>
+            <p>JobShield · Fake Job Detector Mini Project</p>
+            <p>
+                Always verify job offers independently.
+                This tool can make mistakes.
+            </p>
+        </footer>
+
+    </main>
+
+    <!-- Original JavaScript connection unchanged -->
+    <script src="script.js"></script>
+</body>
+</html>
